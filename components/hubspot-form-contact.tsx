@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 
 declare global {
   interface Window {
@@ -10,10 +10,33 @@ declare global {
 
 export default function HubspotFormContact() {
   const [isLoaded, setIsLoaded] = useState(false)
+  const [isInView, setIsInView] = useState(false)
+  const formRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    // Only load the script if it hasn't been loaded yet
-    if (!isLoaded) {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true)
+          observer.disconnect() // Stop observing once it's in view
+        }
+      },
+      { threshold: 0.1 }, // Trigger when 10% of the component is visible
+    )
+
+    if (formRef.current) {
+      observer.observe(formRef.current)
+    }
+
+    return () => {
+      if (formRef.current) {
+        observer.unobserve(formRef.current)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    if (isInView && !isLoaded) {
       const script = document.createElement("script")
       script.src = "//js.hsforms.net/forms/embed/v2.js"
       script.charset = "utf-8"
@@ -110,16 +133,15 @@ export default function HubspotFormContact() {
       document.body.appendChild(script)
 
       return () => {
-        // Clean up the script when the component unmounts
         if (script.parentNode) {
           document.body.removeChild(script)
         }
       }
     }
-  }, [isLoaded])
+  }, [isInView, isLoaded])
 
   return (
-    <div className="relative mt-8 md:mt-0">
+    <div className="relative mt-8 md:mt-0" ref={formRef}>
       {/* Background decorative elements */}
       <div className="absolute -top-5 -right-5 w-32 h-32 bg-blue-100 rounded-full blur-2xl"></div>
       <div className="absolute -bottom-5 -left-5 w-32 h-32 bg-blue-50 rounded-full blur-2xl"></div>
@@ -138,7 +160,7 @@ export default function HubspotFormContact() {
           </p>
         </div>
 
-        {!isLoaded && (
+        {!isInView && (
           <div className="flex items-center justify-center h-64">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-800"></div>
           </div>
