@@ -12,6 +12,7 @@ import BenefitsSection from "@/components/benefits-section"
 import ScrollIndicator from "@/components/scroll-indicator"
 import ProductionCenter from "@/components/production-center"
 import HeroBackground from "@/components/hero-background"
+import YouTubeEmbed from "@/components/youtube-embed" // Import the new component
 
 export default function Home() {
   return (
@@ -273,14 +274,11 @@ export default function Home() {
               </div>
 
               <div className="relative h-[300px] md:h-[400px] shadow-xl overflow-hidden rounded-xl">
-                <iframe
-                  className="absolute top-0 left-0 w-full h-full"
-                  src="https://www.youtube.com/embed/gXgC6TYPurc?autoplay=1&mute=1&playsinline=1&rel=0"
+                <YouTubeEmbed
+                  videoId="gXgC6TYPurc"
                   title="Chocolates CHIAZZA | Franquicias Disponibles"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                ></iframe>
+                  className="w-full h-full"
+                />
               </div>
             </div>
 
@@ -304,7 +302,7 @@ export default function Home() {
             <AnimatedCTA
               text="Solicitar información"
               href="#contacto"
-              variant="chiazzaRed" // Changed to chiazzaRed variant
+              variant="chiazzaRed"
               icon={<Users className="h-4 w-4" />}
             />
           </div>
