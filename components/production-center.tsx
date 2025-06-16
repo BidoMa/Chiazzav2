@@ -4,6 +4,7 @@ import Image from "next/image"
 import { useState } from "react"
 import { Check } from "lucide-react"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+import { cn } from "@/lib/utils" // Import cn for conditional class names
 
 export default function ProductionCenter() {
   const images = [
@@ -14,7 +15,7 @@ export default function ProductionCenter() {
     { src: "/alfajor-packaging.jpeg", alt: "Empaques de alfajores Chiazza" },
   ]
 
-  const [currentImage, setCurrentImage] = useState(images[0])
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
 
   return (
     <section className="py-20 bg-white">
@@ -38,8 +39,8 @@ export default function ProductionCenter() {
                 <DialogTrigger asChild>
                   <div className="relative aspect-video md:h-[400px] w-full rounded-2xl overflow-hidden shadow-xl bg-gray-50 cursor-pointer">
                     <Image
-                      src={currentImage.src || "/placeholder.svg"}
-                      alt={currentImage.alt}
+                      src={images[currentImageIndex].src || "/placeholder.svg"}
+                      alt={images[currentImageIndex].alt}
                       fill
                       sizes="(max-width: 768px) 100vw, 50vw"
                       priority
@@ -47,17 +48,17 @@ export default function ProductionCenter() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
                     <div className="absolute bottom-6 left-6 text-white">
-                      <h3 className="text-xl font-bold mb-1">{currentImage.alt.split(" - ")[0]}</h3>
+                      <h3 className="text-xl font-bold mb-1">{images[currentImageIndex].alt.split(" - ")[0]}</h3>
                       <p className="text-sm text-white/90">
-                        {currentImage.alt.split(" - ")[1] || "Explora la calidad Chiazza"}
+                        {images[currentImageIndex].alt.split(" - ")[1] || "Explora la calidad Chiazza"}
                       </p>
                     </div>
                   </div>
                 </DialogTrigger>
                 <DialogContent className="max-w-4xl p-0">
                   <Image
-                    src={currentImage.src || "/placeholder.svg"}
-                    alt={currentImage.alt}
+                    src={images[currentImageIndex].src || "/placeholder.svg"}
+                    alt={images[currentImageIndex].alt}
                     width={1000}
                     height={1000}
                     className="w-full h-auto object-contain max-h-[80vh]"
@@ -65,25 +66,18 @@ export default function ProductionCenter() {
                 </DialogContent>
               </Dialog>
 
-              <div className="flex gap-3 overflow-x-auto pb-2">
-                {images.map((img, index) => (
-                  <div
+              {/* Dots for navigation */}
+              <div className="flex justify-center gap-2 mt-4">
+                {images.map((_, index) => (
+                  <button
                     key={index}
-                    className={`relative w-24 h-24 rounded-lg overflow-hidden cursor-pointer border-2 transition-all ${
-                      currentImage.src === img.src
-                        ? "border-blue-900 shadow-md"
-                        : "border-gray-200 hover:border-blue-300"
-                    }`}
-                    onClick={() => setCurrentImage(img)}
-                  >
-                    <Image
-                      src={img.src || "/placeholder.svg"}
-                      alt={img.alt}
-                      fill
-                      sizes="96px"
-                      className="object-contain p-2"
-                    />
-                  </div>
+                    className={cn(
+                      "w-3 h-3 rounded-full transition-colors",
+                      currentImageIndex === index ? "bg-blue-900" : "bg-gray-300 hover:bg-gray-400",
+                    )}
+                    onClick={() => setCurrentImageIndex(index)}
+                    aria-label={`Ver imagen ${index + 1}`}
+                  />
                 ))}
               </div>
             </div>
