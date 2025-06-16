@@ -26,9 +26,12 @@ export default function YouTubeEmbed({ videoId, title, className }: YouTubeEmbed
             className="object-cover"
             priority // Prioritize loading the thumbnail
           />
-          <div className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/50 transition-colors">
+          <button
+            className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/50 transition-colors min-w-[48px] min-h-[48px]"
+            aria-label={`Reproducir video: ${title}`}
+          >
             <Play className="h-16 w-16 text-white opacity-80 hover:opacity-100 transition-opacity" />
-          </div>
+          </button>
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 text-white">
             <h3 className="text-lg font-semibold">{title}</h3>
           </div>

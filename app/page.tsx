@@ -48,10 +48,15 @@ export default function Home() {
                 Contacto
               </a>
             </nav>
-            <Button className="bg-white text-blue-900 hover:bg-blue-100 hidden md:flex rounded-full">
+            <Button className="bg-white text-blue-900 hover:bg-blue-100 hidden md:flex rounded-full min-w-[48px] min-h-[48px]">
               <a href="#contacto">Solicitar información</a>
             </Button>
-            <Button variant="ghost" size="icon" className="md:hidden">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden min-w-[48px] min-h-[48px]"
+              aria-label="Abrir menú de navegación"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -330,7 +335,8 @@ export default function Home() {
                   href="https://www.facebook.com/chocolateschiazza"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-400 hover:text-white"
+                  className="text-gray-400 hover:text-white min-w-[48px] min-h-[48px] flex items-center justify-center"
+                  aria-label="Visitar Facebook de Chiazza"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -351,7 +357,8 @@ export default function Home() {
                   href="https://www.instagram.com/chocolateschiazza"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-400 hover:text-white"
+                  className="text-gray-400 hover:text-white min-w-[48px] min-h-[48px] flex items-center justify-center"
+                  aria-label="Visitar Instagram de Chiazza"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
