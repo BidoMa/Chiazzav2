@@ -304,7 +304,7 @@ export default function Home() {
             <AnimatedCTA
               text="Solicitar información"
               href="#contacto"
-              variant="secondary"
+              variant="chiazzaRed" // Changed to chiazzaRed variant
               icon={<Users className="h-4 w-4" />}
             />
           </div>

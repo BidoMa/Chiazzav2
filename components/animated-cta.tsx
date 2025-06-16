@@ -11,7 +11,7 @@ interface AnimatedCTAProps {
   text: string
   href: string
   icon?: React.ReactNode
-  variant?: "primary" | "secondary" | "outline"
+  variant?: "primary" | "secondary" | "outline" | "chiazzaRed" // Added chiazzaRed variant
 }
 
 export default function AnimatedCTA({ text, href, icon, variant = "primary" }: AnimatedCTAProps) {
@@ -43,8 +43,22 @@ export default function AnimatedCTA({ text, href, icon, variant = "primary" }: A
         return "bg-amber-500 hover:bg-amber-600 text-white"
       case "outline":
         return "border-blue-800 text-blue-800 hover:bg-blue-50 border"
+      case "chiazzaRed": // New variant for Chiazza red
+        return "bg-red-800 hover:bg-red-900 text-white"
       default:
         return "bg-blue-800 hover:bg-blue-900 text-white"
+    }
+  }
+
+  const getGradientColors = () => {
+    switch (variant) {
+      case "chiazzaRed":
+        return "from-red-500 via-amber-500 to-red-500" // Red to amber gradient for red button
+      case "primary":
+      case "outline":
+        return "from-amber-400 via-blue-500 to-amber-400" // Existing blue gradient
+      default:
+        return "from-amber-400 via-blue-500 to-amber-400"
     }
   }
 
@@ -66,7 +80,7 @@ export default function AnimatedCTA({ text, href, icon, variant = "primary" }: A
       </Button>
 
       <motion.div
-        className="absolute -inset-1 rounded-lg blur-sm -z-10 bg-gradient-to-r from-amber-400 via-blue-500 to-amber-400"
+        className={`absolute -inset-1 rounded-lg blur-sm -z-10 bg-gradient-to-r ${getGradientColors()}`}
         initial={{ opacity: 0, scale: 0.95 }}
         animate={controls}
       />

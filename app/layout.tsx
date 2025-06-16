@@ -4,6 +4,7 @@ import type { Metadata, Viewport } from "next"
 import { ThemeProvider } from "@/components/theme-provider"
 import VideoConfig from "@/components/video-config"
 import { Lato } from "next/font/google" // Import Lato font
+import Script from "next/script" // Import Next.js Script component
 
 // Configure Lato font
 const lato = Lato({
@@ -35,22 +36,10 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning className={`${lato.variable}`}>
       <head>
-        {/* Removed preconnect links for Google Fonts as next/font handles it */}
         <meta name="description" content="Franquicia de chocolates premium Chiazza" />
-        {/* Google Tag Manager */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-          })(window,document,'script','dataLayer','GTM-MNR9SRL3');`,
-          }}
-        />
-        {/* End Google Tag Manager */}
       </head>
       <body>
-        {/* Google Tag Manager (noscript) */}
+        {/* Google Tag Manager (noscript) - remains in body for non-JS users */}
         <noscript
           dangerouslySetInnerHTML={{
             __html: `<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MNR9SRL3"
@@ -58,6 +47,21 @@ export default function RootLayout({
           }}
         />
         {/* End Google Tag Manager (noscript) */}
+
+        {/* Google Tag Manager Script - now loaded with next/script for optimization */}
+        <Script
+          id="gtm-script"
+          strategy="afterInteractive" // Load after the page is interactive
+          dangerouslySetInnerHTML={{
+            __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','GTM-MNR9SRL3');`,
+          }}
+        />
+        {/* End Google Tag Manager Script */}
+
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           <VideoConfig />
           {children}
