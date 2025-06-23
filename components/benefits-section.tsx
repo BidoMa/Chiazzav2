@@ -20,7 +20,7 @@ export default function BenefitsSection() {
       icon: "award",
       title: "Marca Reconocida",
       description:
-        "Una marca con trayectoria y reconocimiento en el mercado de chocolates premium. Chocolates artesanales de la más alta calidad, elaborados con ingredientes seleccionados y técnicas tradicionales.",
+        "Una marca con trayectoria y reconocimiento en el mercado de chocolates premium. Son de la más alta calidad, elaborados con ingredientes seleccionados y técnicas tradicionales.",
     },
     {
       icon: "trending-up",
