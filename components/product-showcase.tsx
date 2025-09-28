@@ -4,7 +4,7 @@ import Image from "next/image"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
-import { cn } from "@/lib/utils" // Import cn for conditional class names
+import { cn } from "@/lib/utils"
 
 export default function ProductShowcase() {
   const images = [
@@ -94,7 +94,8 @@ export default function ProductShowcase() {
                     alt={images[currentImageIndex].alt}
                     fill
                     sizes="(max-width: 768px) 100vw, 50vw"
-                    priority
+                    priority={currentImageIndex === 0}
+                    loading={currentImageIndex === 0 ? "eager" : "lazy"}
                     className="object-cover"
                   />
                 </div>
@@ -106,6 +107,7 @@ export default function ProductShowcase() {
                   width={1000}
                   height={1000}
                   className="w-full h-auto object-contain max-h-[80vh]"
+                  loading="lazy"
                 />
               </DialogContent>
             </Dialog>

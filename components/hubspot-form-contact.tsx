@@ -13,6 +13,7 @@ export default function HubspotFormContact() {
   const [isInView, setIsInView] = useState(false)
   const formRef = useRef<HTMLDivElement>(null)
   const observerRef = useRef<IntersectionObserver | null>(null)
+  const scriptRef = useRef<HTMLScriptElement | null>(null)
 
   const handleIntersection = useCallback((entries: IntersectionObserverEntry[]) => {
     const [entry] = entries
@@ -31,13 +32,13 @@ export default function HubspotFormContact() {
     try {
       observerRef.current = new IntersectionObserver(handleIntersection, {
         threshold: 0.1,
-        rootMargin: "50px",
+        rootMargin: "100px",
       })
 
       observerRef.current.observe(formRef.current)
     } catch (error) {
       console.warn("IntersectionObserver error:", error)
-      setIsInView(true) // Fallback to load immediately
+      setIsInView(true)
     }
 
     return () => {
@@ -49,13 +50,14 @@ export default function HubspotFormContact() {
   }, [handleIntersection, isInView])
 
   useEffect(() => {
-    if (isInView && !isLoaded) {
+    if (isInView && !isLoaded && !scriptRef.current) {
       const script = document.createElement("script")
       script.src = "//js.hsforms.net/forms/embed/v2.js"
       script.charset = "utf-8"
       script.type = "text/javascript"
       script.async = true
       script.defer = true
+      scriptRef.current = script
 
       script.onload = () => {
         try {
@@ -149,14 +151,16 @@ export default function HubspotFormContact() {
 
       script.onerror = () => {
         console.error("Failed to load HubSpot script")
+        scriptRef.current = null
       }
 
-      document.body.appendChild(script)
+      document.head.appendChild(script)
 
       return () => {
         try {
-          if (script.parentNode) {
-            document.body.removeChild(script)
+          if (scriptRef.current && scriptRef.current.parentNode) {
+            document.head.removeChild(scriptRef.current)
+            scriptRef.current = null
           }
         } catch (error) {
           console.warn("Error removing HubSpot script:", error)
@@ -168,8 +172,8 @@ export default function HubspotFormContact() {
   return (
     <div className="relative mt-8 md:mt-0" ref={formRef}>
       {/* Background decorative elements */}
-      <div className="absolute -top-5 -right-5 w-32 h-32 bg-blue-100 rounded-full blur-2xl"></div>
-      <div className="absolute -bottom-5 -left-5 w-32 h-32 bg-blue-50 rounded-full blur-2xl"></div>
+      <div className="absolute -top-5 -right-5 w-32 h-32 bg-blue-100 rounded-full blur-2xl opacity-50"></div>
+      <div className="absolute -bottom-5 -left-5 w-32 h-32 bg-blue-50 rounded-full blur-2xl opacity-50"></div>
 
       <div
         id="hubspot-form-contact-container"
@@ -185,7 +189,7 @@ export default function HubspotFormContact() {
           </p>
         </div>
 
-        {!isInView && (
+        {!isLoaded && isInView && (
           <div className="flex items-center justify-center h-64">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-800"></div>
           </div>

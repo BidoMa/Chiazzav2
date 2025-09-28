@@ -4,11 +4,13 @@ import Image from "next/image"
 import { useState } from "react"
 import { Check } from "lucide-react"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
-import { cn } from "@/lib/utils" // Import cn for conditional class names
+import { cn } from "@/lib/utils"
 
 export default function ProductionCenter() {
   const images = [
     { src: "/local-chiazza.jpg", alt: "Interior de un local Chiazza" },
+    { src: "/chiazza-interior-1.jpg", alt: "Interior del local Chiazza" },
+    { src: "/chiazza-interior-2.jpg", alt: "Vitrina de chocolates y bombones en local Chiazza" },
     { src: "/alfajores-covered.jpeg", alt: "Alfajores siendo cubiertos de chocolate en producción" },
     { src: "/alfajores-production.jpeg", alt: "Línea de producción de alfajores" },
     { src: "/chocolate-pouring.jpeg", alt: "Chocolate siendo vertido en moldes" },
@@ -43,7 +45,8 @@ export default function ProductionCenter() {
                       alt={images[currentImageIndex].alt}
                       fill
                       sizes="(max-width: 768px) 100vw, 50vw"
-                      priority
+                      priority={currentImageIndex === 0}
+                      loading={currentImageIndex === 0 ? "eager" : "lazy"}
                       className="object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
@@ -62,6 +65,7 @@ export default function ProductionCenter() {
                     width={1000}
                     height={1000}
                     className="w-full h-auto object-contain max-h-[80vh]"
+                    loading="lazy"
                   />
                 </DialogContent>
               </Dialog>

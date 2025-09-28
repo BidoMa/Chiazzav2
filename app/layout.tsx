@@ -8,12 +8,13 @@ const lato = Lato({
   subsets: ["latin"],
   weight: ["400", "700"],
   display: "swap",
+  preload: true,
 })
 
 export const metadata: Metadata = {
-  title: "Franquicias Chiazza - Chocolates Artesanales Premium",
+  title: "Franquicias Chiazza - Chocolates Artesanales Premium | Oportunidad de Negocio",
   description:
-    "Descubrí el sabor del mejor chocolate artesanal y convertite en franquiciado de Chiazza. Negocio rentable con el respaldo de una marca líder en chocolates premium.",
+    "Descubrí el sabor del mejor chocolate artesanal y convertite en franquiciado de Chiazza. Negocio rentable con más de 20 años de experiencia. Solicita información sobre nuestra franquicia de chocolates premium.",
   keywords: [
     "franquicia chiazza",
     "chocolates artesanales",
@@ -21,8 +22,12 @@ export const metadata: Metadata = {
     "negocio rentable",
     "chocolate premium",
     "oportunidad de negocio",
+    "franquicia chocolatería",
+    "inversión rentable",
+    "alfajores artesanales",
+    "bombones premium",
   ],
-  authors: [{ name: "Chiazza" }],
+  authors: [{ name: "Chiazza", url: "https://franquiciaschiazza.com.ar" }],
   creator: "Chiazza",
   publisher: "Chiazza",
   formatDetection: {
@@ -45,7 +50,8 @@ export const metadata: Metadata = {
         url: "/chiazza-logo-new.webp",
         width: 1200,
         height: 630,
-        alt: "Franquicias Chiazza - Chocolates Artesanales",
+        alt: "Franquicias Chiazza - Chocolates Artesanales Premium",
+        type: "image/webp",
       },
     ],
     locale: "es_AR",
@@ -57,6 +63,7 @@ export const metadata: Metadata = {
     description:
       "Descubrí el sabor del mejor chocolate artesanal y convertite en franquiciado de Chiazza. Negocio rentable con el respaldo de una marca líder.",
     images: ["/chiazza-logo-new.webp"],
+    creator: "@chocolateschiazza",
   },
   robots: {
     index: true,
@@ -83,6 +90,9 @@ export const metadata: Metadata = {
   manifest: "/site.webmanifest",
   other: {
     "theme-color": "#0D2747",
+    "msapplication-TileColor": "#0D2747",
+    "apple-mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-status-bar-style": "default",
   },
     generator: 'v0.app'
 }
@@ -93,8 +103,44 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="es">
+    <html lang="es" dir="ltr">
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="//js.hsforms.net" />
+        <link rel="dns-prefetch" href="//www.googletagmanager.com" />
+        <link rel="preload" href="/chiazza-logo-new.webp" as="image" type="image/webp" />
+        <link rel="preload" href="/chiazza-store-hero.jpeg" as="image" type="image/jpeg" />
+
+        <Script
+          id="structured-data"
+          type="application/ld+json"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "Chiazza",
+              description: "Franquicias de chocolates artesanales premium con más de 20 años de experiencia",
+              url: "https://franquiciaschiazza.com.ar",
+              logo: "https://franquiciaschiazza.com.ar/chiazza-logo-new.webp",
+              contactPoint: {
+                "@type": "ContactPoint",
+                contactType: "sales",
+                areaServed: "AR",
+                availableLanguage: "Spanish",
+              },
+              sameAs: ["https://www.facebook.com/chocolateschiazza", "https://www.instagram.com/chocolateschiazza"],
+              offers: {
+                "@type": "Offer",
+                name: "Franquicia Chiazza",
+                description: "Oportunidad de franquicia para chocolatería artesanal premium",
+                category: "Franchise Opportunity",
+              },
+            }),
+          }}
+        />
+
         <Script
           id="gtm-script"
           strategy="afterInteractive"
@@ -108,6 +154,7 @@ export default function RootLayout({
             `,
           }}
         />
+
         <Script
           id="resize-observer-error-handler"
           strategy="beforeInteractive"
