@@ -38,6 +38,7 @@ export default function YouTubeEmbed({ videoId, title, className = "" }: YouTube
         fill
         className="object-cover"
         sizes="(max-width: 768px) 100vw, 50vw"
+        unoptimized
       />
       <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
         <button
