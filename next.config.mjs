@@ -21,6 +21,19 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react'],
   },
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value: "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.hsforms.net https://forms.hsforms.com; connect-src 'self' https://forms.hsforms.com https://api.hsforms.com; frame-src 'self' https://forms.hsforms.com;",
+          },
+        ],
+      },
+    ]
+  },
 }
 
 export default nextConfig
