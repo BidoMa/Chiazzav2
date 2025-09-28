@@ -94,7 +94,7 @@ export const metadata: Metadata = {
     "apple-mobile-web-app-capable": "yes",
     "apple-mobile-web-app-status-bar-style": "default",
   },
-    generator: 'v0.app'
+  generator: "v0.app",
 }
 
 export default function RootLayout({
@@ -160,12 +160,42 @@ export default function RootLayout({
           strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `
+              // Handle window errors
               window.addEventListener('error', function(e) {
-                if (e.message && e.message.includes('ResizeObserver loop completed with undelivered notifications')) {
+                if (e.message && (
+                  e.message.includes('ResizeObserver loop completed with undelivered notifications') ||
+                  e.message.includes('ResizeObserver loop limit exceeded') ||
+                  e.message.includes('ResizeObserver')
+                )) {
                   e.stopImmediatePropagation();
+                  e.preventDefault();
                   return false;
                 }
               });
+              
+              // Handle unhandled promise rejections
+              window.addEventListener('unhandledrejection', function(e) {
+                if (e.reason && e.reason.message && (
+                  e.reason.message.includes('ResizeObserver loop completed with undelivered notifications') ||
+                  e.reason.message.includes('ResizeObserver loop limit exceeded') ||
+                  e.reason.message.includes('ResizeObserver')
+                )) {
+                  e.preventDefault();
+                  return false;
+                }
+              });
+              
+              // Override console.error to suppress ResizeObserver errors
+              const originalConsoleError = console.error;
+              console.error = function(...args) {
+                const message = args.join(' ');
+                if (message.includes('ResizeObserver loop completed with undelivered notifications') ||
+                    message.includes('ResizeObserver loop limit exceeded') ||
+                    message.includes('ResizeObserver')) {
+                  return;
+                }
+                originalConsoleError.apply(console, args);
+              };
             `,
           }}
         />

@@ -18,9 +18,7 @@ const nextConfig = {
   generateEtags: true,
   trailingSlash: false,
   reactStrictMode: true,
-  swcMinify: true,
   experimental: {
-    optimizeCss: true,
     optimizePackageImports: ['lucide-react'],
   },
 }
