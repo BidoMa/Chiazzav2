@@ -18,36 +18,38 @@ export default function BenefitsSection() {
   const benefits = [
     {
       icon: "award",
-      title: "Marca Reconocida",
+      title: "Un solo proveedor (fábrica propia)",
       description:
-        "Una marca con trayectoria y reconocimiento en el mercado de chocolates premium. Son de la más alta calidad, elaborados con ingredientes seleccionados y técnicas tradicionales.",
-    },
-    {
-      icon: "trending-up",
-      title: "Negocio Rentable",
-      description: "Modelo de negocio probado con excelente retorno de inversión y múltiples fuentes de ingresos.",
-    },
-    {
-      icon: "users",
-      title: "Soporte Continuo",
-      description:
-        "Capacitación completa, asistencia en la apertura y acompañamiento constante para el éxito de tu negocio.",
-    },
-    {
-      icon: "map-pin",
-      title: "Ubicación Estratégica",
-      description: "Asesoramiento para la selección de la mejor ubicación y análisis de mercado personalizado.",
+        "Contamos con nuestra propia fábrica, lo que garantiza calidad constante, precios competitivos y suministro confiable para tu negocio.",
     },
     {
       icon: "tool",
-      title: "Know-How Completo",
-      description: "Transferencia de conocimiento, manuales operativos y acceso a proveedores exclusivos.",
+      title: "Sin cocina ni producción en el local",
+      description:
+        "No necesitas equipamiento de cocina ni personal especializado en producción. Todo llega listo desde nuestra fábrica.",
     },
     {
-      icon: "shopping-bag", // Using shopping-bag as a placeholder icon, can be changed if a more suitable icon for "personal" is available.
-      title: "Requerimientos mínimos de personal",
+      icon: "users",
+      title: "Un empleado por turno",
       description:
-        "Nuestro sistema está pensado para que el establecimiento funcione eficientemente con una cantidad limitada de empleados.",
+        "Modelo operativo simple que requiere solo una persona por turno, reduciendo costos laborales y simplificando la gestión.",
+    },
+    {
+      icon: "map-pin",
+      title: "Locales chicos, fáciles de manejar",
+      description: "Espacios compactos y eficientes que minimizan costos de alquiler y facilitan la operación diaria.",
+    },
+    {
+      icon: "trending-up",
+      title: "Inversión accesible",
+      description:
+        "Modelo de inversión diseñado para ser accesible, con costos iniciales optimizados y estructura financiera clara.",
+    },
+    {
+      icon: "shopping-bag",
+      title: "Recuperable en 18–24 meses",
+      description:
+        "Retorno de inversión proyectado entre 18 y 24 meses, basado en nuestro modelo de negocio probado y rentable.",
     },
   ]
 
