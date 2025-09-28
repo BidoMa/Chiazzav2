@@ -11,10 +11,10 @@ export default function ProductionCenter() {
     { src: "/local-chiazza.jpg", alt: "Interior de un local Chiazza" },
     { src: "/chiazza-interior-1.jpg", alt: "Interior del local Chiazza" },
     { src: "/chiazza-interior-2.jpg", alt: "Vitrina de chocolates y bombones en local Chiazza" },
+    { src: "/chiazza-storefront.jpg", alt: "Fachada exterior del local Chiazza" },
     { src: "/alfajores-covered.jpeg", alt: "Alfajores siendo cubiertos de chocolate en producción" },
     { src: "/alfajores-production.jpeg", alt: "Línea de producción de alfajores" },
     { src: "/chocolate-pouring.jpeg", alt: "Chocolate siendo vertido en moldes" },
-    { src: "/alfajor-packaging.jpeg", alt: "Empaques de alfajores Chiazza" },
   ]
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0)

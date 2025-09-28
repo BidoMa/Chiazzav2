@@ -105,36 +105,72 @@ export default function RootLayout({
   return (
     <html lang="es" dir="ltr">
       <head>
+        {/* MUST be the very first script to run before anything else */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
+              // Immediate execution before any other scripts or React components
               (function() {
-                // Immediately override console.error
+                'use strict';
+                
+                // Store original ResizeObserver
+                const OriginalResizeObserver = window.ResizeObserver;
+                
+                if (!OriginalResizeObserver) return;
+                
+                // Create a debounced wrapper for ResizeObserver
+                function createDebouncedResizeObserver(callback, delay = 16) {
+                  let timeoutId;
+                  let entries = [];
+                  
+                  const debouncedCallback = function(newEntries) {
+                    entries = entries.concat(newEntries);
+                    
+                    if (timeoutId) {
+                      clearTimeout(timeoutId);
+                    }
+                    
+                    timeoutId = setTimeout(() => {
+                      try {
+                        callback(entries);
+                      } catch (error) {
+                        // Silently handle any errors
+                      }
+                      entries = [];
+                      timeoutId = null;
+                    }, delay);
+                  };
+                  
+                  return new OriginalResizeObserver(debouncedCallback);
+                }
+                
+                // Replace ResizeObserver with debounced version
+                window.ResizeObserver = function(callback) {
+                  return createDebouncedResizeObserver(callback);
+                };
+                
+                // Preserve prototype
+                window.ResizeObserver.prototype = OriginalResizeObserver.prototype;
+                
+                // Also suppress any errors that might still occur
                 const originalError = console.error;
                 console.error = function(...args) {
-                  const message = args.join(' ');
+                  const message = String(args[0] || '');
                   if (message.includes('ResizeObserver')) {
                     return;
                   }
-                  originalError.apply(console, args);
+                  return originalError.apply(console, args);
                 };
                 
-                // Override window.onerror immediately
-                window.onerror = function(message, source, lineno, colno, error) {
-                  if (typeof message === 'string' && message.includes('ResizeObserver')) {
-                    return true;
-                  }
-                  return false;
-                };
-                
-                // Set up error event listener immediately
+                // Global error handler
                 window.addEventListener('error', function(e) {
                   if (e.message && e.message.includes('ResizeObserver')) {
-                    e.stopImmediatePropagation();
                     e.preventDefault();
+                    e.stopPropagation();
                     return false;
                   }
-                });
+                }, true);
+                
               })();
             `,
           }}
