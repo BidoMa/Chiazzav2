@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState, useRef, useCallback } from "react"
 
 declare global {
   interface Window {
@@ -12,28 +12,41 @@ export default function HubspotForm() {
   const [isLoaded, setIsLoaded] = useState(false)
   const [isInView, setIsInView] = useState(false)
   const formRef = useRef<HTMLDivElement>(null)
+  const observerRef = useRef<IntersectionObserver | null>(null)
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsInView(true)
-          observer.disconnect() // Stop observing once it's in view
-        }
-      },
-      { threshold: 0.1 }, // Trigger when 10% of the component is visible
-    )
-
-    if (formRef.current) {
-      observer.observe(formRef.current)
-    }
-
-    return () => {
-      if (formRef.current) {
-        observer.unobserve(formRef.current)
+  const handleIntersection = useCallback((entries: IntersectionObserverEntry[]) => {
+    const [entry] = entries
+    if (entry.isIntersecting) {
+      setIsInView(true)
+      if (observerRef.current) {
+        observerRef.current.disconnect()
+        observerRef.current = null
       }
     }
   }, [])
+
+  useEffect(() => {
+    if (!formRef.current || isInView) return
+
+    try {
+      observerRef.current = new IntersectionObserver(handleIntersection, {
+        threshold: 0.1,
+        rootMargin: "50px",
+      })
+
+      observerRef.current.observe(formRef.current)
+    } catch (error) {
+      console.warn("IntersectionObserver error:", error)
+      setIsInView(true) // Fallback to load immediately
+    }
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect()
+        observerRef.current = null
+      }
+    }
+  }, [handleIntersection, isInView])
 
   useEffect(() => {
     if (isInView && !isLoaded) {
@@ -45,104 +58,116 @@ export default function HubspotForm() {
       script.defer = true
 
       script.onload = () => {
-        if (window.hbspt) {
-          window.hbspt.forms.create({
-            portalId: "22460986",
-            formId: "e868b09c-6f97-48da-bf52-afbc82a1f232",
-            region: "na1",
-            target: "#hubspot-form-container",
-            css: `
-              .hs-form-field label {
-                color: #1f2937;
-                font-weight: 500;
-                margin-bottom: 6px;
-                font-size: 0.95rem;
-                letter-spacing: 0.01em;
-              }
-              .hs-form-field input, .hs-form-field textarea, .hs-form-field select {
-                border-radius: 8px;
-                border: 1px solid #e5e7eb;
-                background-color: #ffffff;
-                padding: 12px 16px;
-                font-size: 16px;
-                transition: all 0.3s ease;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-                width: 100%;
-              }
-              .hs-form-field input:focus, .hs-form-field textarea:focus, .hs-form-field select:focus {
-                border-color: #1e40af;
-                box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.2), 0 4px 8px rgba(0,0,0,0.1);
-                outline: none;
-                transform: translateY(-1px);
-              }
-              .hs-button {
-                background-color: #1e40af !important;
-                color: #ffffff !important;
-                border: none !important;
-                border-radius: 8px !important;
-                padding: 14px 28px !important;
-                font-weight: 600 !important;
-                font-size: 16px !important;
-                cursor: pointer !important;
-                transition: all 0.3s ease !important;
-                box-shadow: 0 4px 12px rgba(30, 64, 175, 0.2) !important;
-                text-transform: uppercase !important;
-                letter-spacing: 0.03em !important;
-                width: 100% !important;
-              }
-              .hs-button:hover {
-                background-color: #1e3a8a !important;
-                transform: translateY(-2px) !important;
-                box-shadow: 0 6px 16px rgba(30, 64, 175, 0.3) !important;
-              }
-              .hs-error-msg {
-                color: #1e40af !important;
-                font-size: 0.85rem !important;
-                margin-top: 4px !important;
-              }
-              .submitted-message {
-                color: #065f46 !important;
-                background-color: #d1fae5 !important;
-                padding: 20px !important;
-                border-radius: 8px !important;
-                text-align: center !important;
-                font-size: 1.1rem !important;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
-              }
-              .hs-form {
-                margin-top: 1rem !important;
-              }
-              .hs-richtext {
-                color: #1f2937 !important;
-              }
-              .legal-consent-container {
-                color: #4b5563 !important;
-                font-size: 0.85rem !important;
-              }
-              .legal-consent-container a {
-                color: #1e40af !important;
-                text-decoration: underline !important;
-              }
-              @media (max-width: 767px) {
-                .hs-form-field {
-                  margin-bottom: 16px !important;
+        try {
+          if (window.hbspt) {
+            window.hbspt.forms.create({
+              portalId: "22460986",
+              formId: "e868b09c-6f97-48da-bf52-afbc82a1f232",
+              region: "na1",
+              target: "#hubspot-form-container",
+              css: `
+                .hs-form-field label {
+                  color: #1f2937;
+                  font-weight: 500;
+                  margin-bottom: 6px;
+                  font-size: 0.95rem;
+                  letter-spacing: 0.01em;
+                }
+                .hs-form-field input, .hs-form-field textarea, .hs-form-field select {
+                  border-radius: 8px;
+                  border: 1px solid #e5e7eb;
+                  background-color: #ffffff;
+                  padding: 12px 16px;
+                  font-size: 16px;
+                  transition: all 0.3s ease;
+                  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                  width: 100%;
+                }
+                .hs-form-field input:focus, .hs-form-field textarea:focus, .hs-form-field select:focus {
+                  border-color: #1e40af;
+                  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.2), 0 4px 8px rgba(0,0,0,0.1);
+                  outline: none;
+                  transform: translateY(-1px);
                 }
                 .hs-button {
-                  padding: 12px 20px !important;
-                  font-size: 14px !important;
+                  background-color: #1e40af !important;
+                  color: #ffffff !important;
+                  border: none !important;
+                  border-radius: 8px !important;
+                  padding: 14px 28px !important;
+                  font-weight: 600 !important;
+                  font-size: 16px !important;
+                  cursor: pointer !important;
+                  transition: all 0.3s ease !important;
+                  box-shadow: 0 4px 12px rgba(30, 64, 175, 0.2) !important;
+                  text-transform: uppercase !important;
+                  letter-spacing: 0.03em !important;
+                  width: 100% !important;
                 }
-              }
-            `,
-          })
-          setIsLoaded(true)
+                .hs-button:hover {
+                  background-color: #1e3a8a !important;
+                  transform: translateY(-2px) !important;
+                  box-shadow: 0 6px 16px rgba(30, 64, 175, 0.3) !important;
+                }
+                .hs-error-msg {
+                  color: #1e40af !important;
+                  font-size: 0.85rem !important;
+                  margin-top: 4px !important;
+                }
+                .submitted-message {
+                  color: #065f46 !important;
+                  background-color: #d1fae5 !important;
+                  padding: 20px !important;
+                  border-radius: 8px !important;
+                  text-align: center !important;
+                  font-size: 1.1rem !important;
+                  box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+                }
+                .hs-form {
+                  margin-top: 1rem !important;
+                }
+                .hs-richtext {
+                  color: #1f2937 !important;
+                }
+                .legal-consent-container {
+                  color: #4b5563 !important;
+                  font-size: 0.85rem !important;
+                }
+                .legal-consent-container a {
+                  color: #1e40af !important;
+                  text-decoration: underline !important;
+                }
+                @media (max-width: 767px) {
+                  .hs-form-field {
+                    margin-bottom: 16px !important;
+                  }
+                  .hs-button {
+                    padding: 12px 20px !important;
+                    font-size: 14px !important;
+                  }
+                }
+              `,
+            })
+            setIsLoaded(true)
+          }
+        } catch (error) {
+          console.error("HubSpot form creation error:", error)
         }
+      }
+
+      script.onerror = () => {
+        console.error("Failed to load HubSpot script")
       }
 
       document.body.appendChild(script)
 
       return () => {
-        if (script.parentNode) {
-          document.body.removeChild(script)
+        try {
+          if (script.parentNode) {
+            document.body.removeChild(script)
+          }
+        } catch (error) {
+          console.warn("Error removing HubSpot script:", error)
         }
       }
     }
