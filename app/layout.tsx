@@ -11,17 +11,16 @@ const lato = Lato({
 })
 
 export const metadata: Metadata = {
-  title: "Franquicias Chiazza - Chocolatería Premium",
+  title: "Franquicias Chiazza - Chocolates Artesanales Premium",
   description:
-    "Abrí tu propia franquicia Chiazza. Chocolates artesanales de la más alta calidad con un modelo de negocio probado y rentable.",
+    "Descubrí el sabor del mejor chocolate artesanal y convertite en franquiciado de Chiazza. Negocio rentable con el respaldo de una marca líder en chocolates premium.",
   keywords: [
-    "franquicia",
-    "chocolatería",
-    "Chiazza",
-    "negocio rentable",
+    "franquicia chiazza",
     "chocolates artesanales",
-    "inversión",
-    "emprendimiento",
+    "franquicias argentina",
+    "negocio rentable",
+    "chocolate premium",
+    "oportunidad de negocio",
   ],
   authors: [{ name: "Chiazza" }],
   creator: "Chiazza",
@@ -31,22 +30,22 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://chiazza.vercel.app"),
+  metadataBase: new URL("https://franquiciaschiazza.com.ar"),
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "Franquicias Chiazza - Chocolatería Premium",
+    title: "Franquicias Chiazza - Chocolates Artesanales Premium",
     description:
-      "Abrí tu propia franquicia Chiazza. Chocolates artesanales de la más alta calidad con un modelo de negocio probado y rentable.",
-    url: "https://chiazza.vercel.app",
+      "Descubrí el sabor del mejor chocolate artesanal y convertite en franquiciado de Chiazza. Negocio rentable con el respaldo de una marca líder.",
+    url: "https://franquiciaschiazza.com.ar",
     siteName: "Franquicias Chiazza",
     images: [
       {
-        url: "/chiazza-store-hero.jpeg",
+        url: "/chiazza-logo-new.webp",
         width: 1200,
         height: 630,
-        alt: "Franquicia Chiazza - Chocolatería Premium",
+        alt: "Franquicias Chiazza - Chocolates Artesanales",
       },
     ],
     locale: "es_AR",
@@ -54,10 +53,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Franquicias Chiazza - Chocolatería Premium",
+    title: "Franquicias Chiazza - Chocolates Artesanales Premium",
     description:
-      "Abrí tu propia franquicia Chiazza. Chocolates artesanales de la más alta calidad con un modelo de negocio probado y rentable.",
-    images: ["/chiazza-store-hero.jpeg"],
+      "Descubrí el sabor del mejor chocolate artesanal y convertite en franquiciado de Chiazza. Negocio rentable con el respaldo de una marca líder.",
+    images: ["/chiazza-logo-new.webp"],
   },
   robots: {
     index: true,
@@ -72,24 +71,19 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/favicon.ico" },
       { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
       { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
     ],
     apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
     other: [
-      {
-        rel: "android-chrome-192x192",
-        url: "/android-chrome-192x192.png",
-      },
-      {
-        rel: "android-chrome-512x512",
-        url: "/android-chrome-512x512.png",
-      },
+      { rel: "android-chrome-192x192", url: "/android-chrome-192x192.png" },
+      { rel: "android-chrome-512x512", url: "/android-chrome-512x512.png" },
     ],
   },
   manifest: "/site.webmanifest",
-  themeColor: "#0D2747",
+  other: {
+    "theme-color": "#0D2747",
+  },
     generator: 'v0.app'
 }
 
@@ -115,20 +109,13 @@ export default function RootLayout({
           }}
         />
         <Script
-          id="error-handler"
+          id="resize-observer-error-handler"
           strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               window.addEventListener('error', function(e) {
-                if (e.message && e.message.includes('ResizeObserver loop')) {
+                if (e.message && e.message.includes('ResizeObserver loop completed with undelivered notifications')) {
                   e.stopImmediatePropagation();
-                  return false;
-                }
-              });
-              
-              window.addEventListener('unhandledrejection', function(e) {
-                if (e.reason && e.reason.message && e.reason.message.includes('ResizeObserver loop')) {
-                  e.preventDefault();
                   return false;
                 }
               });

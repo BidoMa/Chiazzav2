@@ -1,7 +1,9 @@
-import { Suspense } from "react"
+"use client"
+
+import { Suspense, useState } from "react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Coffee, Star, Award, Users } from "lucide-react"
+import { Coffee, Star, Award, Users, X } from "lucide-react"
 import TestimonialCard from "@/components/testimonial-card"
 import ProductShowcase from "@/components/product-showcase"
 import { Separator } from "@/components/ui/separator"
@@ -12,9 +14,19 @@ import BenefitsSection from "@/components/benefits-section"
 import ScrollIndicator from "@/components/scroll-indicator"
 import ProductionCenter from "@/components/production-center"
 import HeroBackground from "@/components/hero-background"
-import YouTubeEmbed from "@/components/youtube-embed" // Import the new component
+import YouTubeEmbed from "@/components/youtube-embed"
 
 export default function Home() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen)
+  }
+
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false)
+  }
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Header */}
@@ -54,8 +66,9 @@ export default function Home() {
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden min-w-[48px] min-h-[48px]"
+              className="md:hidden min-w-[48px] min-h-[48px] text-white"
               aria-label="Abrir menú de navegación"
+              onClick={toggleMobileMenu}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -67,7 +80,7 @@ export default function Home() {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="h-6 w-6 text-white"
+                className="h-6 w-6"
               >
                 <line x1="4" x2="20" y1="12" y2="12" />
                 <line x1="4" x2="20" y1="6" y2="6" />
@@ -76,6 +89,79 @@ export default function Home() {
             </Button>
           </div>
         </div>
+
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden fixed inset-0 z-50 bg-blue-900">
+            <div className="flex flex-col h-full">
+              <div className="flex items-center justify-between p-4 border-b border-blue-800">
+                <Image
+                  src="/chiazza-logo-new.webp"
+                  alt="Chocolates CHIAZZA"
+                  width={150}
+                  height={50}
+                  className="h-10 w-auto invert-0"
+                />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-white min-w-[48px] min-h-[48px]"
+                  onClick={closeMobileMenu}
+                  aria-label="Cerrar menú"
+                >
+                  <X className="h-6 w-6" />
+                </Button>
+              </div>
+              <nav className="flex flex-col p-4 space-y-4">
+                <a
+                  href="#productos"
+                  className="text-lg font-medium text-white hover:text-blue-200 transition-colors py-3 border-b border-blue-800"
+                  onClick={closeMobileMenu}
+                >
+                  Productos
+                </a>
+                <a
+                  href="#beneficios"
+                  className="text-lg font-medium text-white hover:text-blue-200 transition-colors py-3 border-b border-blue-800"
+                  onClick={closeMobileMenu}
+                >
+                  Beneficios
+                </a>
+                <a
+                  href="#locales"
+                  className="text-lg font-medium text-white hover:text-blue-200 transition-colors py-3 border-b border-blue-800"
+                  onClick={closeMobileMenu}
+                >
+                  Locales
+                </a>
+                <a
+                  href="#testimonios"
+                  className="text-lg font-medium text-white hover:text-blue-200 transition-colors py-3 border-b border-blue-800"
+                  onClick={closeMobileMenu}
+                >
+                  Testimonios
+                </a>
+                <a
+                  href="#contacto"
+                  className="text-lg font-medium text-white hover:text-blue-200 transition-colors py-3 border-b border-blue-800"
+                  onClick={closeMobileMenu}
+                >
+                  Contacto
+                </a>
+                <div className="pt-4">
+                  <Button
+                    className="bg-white text-blue-900 hover:bg-blue-100 w-full rounded-full min-h-[48px]"
+                    onClick={closeMobileMenu}
+                  >
+                    <a href="#contacto" className="w-full">
+                      Solicitar información
+                    </a>
+                  </Button>
+                </div>
+              </nav>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Scroll Progress Indicator */}
@@ -159,8 +245,6 @@ export default function Home() {
 
       {/* Production Center Section */}
       <section id="locales">
-        {" "}
-        {/* Added id="locales" here */}
         <ProductionCenter />
       </section>
 

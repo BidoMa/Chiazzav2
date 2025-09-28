@@ -1,6 +1,7 @@
 {
   "name": "Franquicias Chiazza",
   "short_name": "Chiazza",
+  "description": "Franquicias de chocolates artesanales premium",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",
@@ -15,5 +16,7 @@
   ],
   "theme_color": "#0D2747",
   "background_color": "#ffffff",
-  "display": "standalone"
+  "display": "standalone",
+  "start_url": "/",
+  "scope": "/"
 }
