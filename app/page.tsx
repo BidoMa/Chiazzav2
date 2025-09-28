@@ -177,11 +177,10 @@ export default function Home() {
                 <span className="text-sm font-medium">Oportunidad de negocio</span>
               </div>
               <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-                Descubrí el sabor del mejor chocolate artesanal
+                Abrí tu chocolatería simple de operar con el respaldo de Chiazza
               </h1>
               <p className="text-lg md:text-xl text-white/90 mb-8 max-w-xl">
-                Convertite en franquiciado de Chiazza y llevá un negocio rentable y apasionante a tu comunidad con el
-                respaldo de una marca líder.
+                Un solo proveedor, sin producción y con apenas un empleado por turno
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <AnimatedCTA text="Solicitar información" href="#contacto" variant="primary" />
