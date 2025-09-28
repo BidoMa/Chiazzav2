@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState, useRef, useCallback } from "react"
-import Script from "next/script"
 
 declare global {
   interface Window {
@@ -9,55 +8,163 @@ declare global {
   }
 }
 
-export default function HubspotForm() {
-  const [isLoaded, setIsLoaded] = useState(false)
-  const [isInView, setIsInView] = useState(false)
-  const [scriptLoaded, setScriptLoaded] = useState(false)
-  const formRef = useRef<HTMLDivElement>(null)
-  const observerRef = useRef<IntersectionObserver | null>(null)
+let hubspotScriptLoaded = false
+let hubspotScriptLoading = false
 
-  const handleIntersection = useCallback((entries: IntersectionObserverEntry[]) => {
-    const [entry] = entries
-    if (entry.isIntersecting) {
-      setIsInView(true)
-      if (observerRef.current) {
-        observerRef.current.disconnect()
-        observerRef.current = null
-      }
+interface HubspotFormProps {
+  portalId?: string
+  formId?: string
+  region?: string
+  targetId: string
+  variant?: "hero" | "contact"
+}
+
+const loadHubSpotScript = (): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    if (hubspotScriptLoaded && window.hbspt) {
+      resolve()
+      return
     }
-  }, [])
+
+    if (hubspotScriptLoading) {
+      const checkLoaded = () => {
+        if (hubspotScriptLoaded && window.hbspt) {
+          resolve()
+        } else {
+          setTimeout(checkLoaded, 100)
+        }
+      }
+      checkLoaded()
+      return
+    }
+
+    const existingScript = document.getElementById("hubspot-forms-embed-script")
+    if (existingScript) {
+      if (window.hbspt) {
+        hubspotScriptLoaded = true
+        resolve()
+      } else {
+        // Script exists but not loaded yet
+        existingScript.addEventListener("load", () => {
+          hubspotScriptLoaded = true
+          hubspotScriptLoading = false
+          resolve()
+        })
+      }
+      return
+    }
+
+    hubspotScriptLoading = true
+    const script = document.createElement("script")
+    script.id = "hubspot-forms-embed-script"
+    script.src = "https://js.hsforms.net/forms/embed/v2.js"
+    script.charset = "utf-8"
+    script.type = "text/javascript"
+    script.async = true
+    script.defer = true
+
+    script.onload = () => {
+      hubspotScriptLoaded = true
+      hubspotScriptLoading = false
+      resolve()
+    }
+
+    script.onerror = () => {
+      hubspotScriptLoading = false
+      reject(new Error("Failed to load HubSpot script"))
+    }
+
+    document.head.appendChild(script)
+  })
+}
+
+export default function HubspotForm({
+  portalId = "22460986",
+  formId = "e868b09c-6f97-48da-bf52-afbc82a1f232",
+  region = "na1",
+  targetId,
+  variant = "hero",
+}: HubspotFormProps) {
+  const [isInView, setIsInView] = useState(false)
+  const formRef = useRef<HTMLDivElement>(null)
+  const formContainerRef = useRef<HTMLDivElement>(null)
+  const observerRef = useRef<IntersectionObserver | null>(null)
+  const formCreatedRef = useRef(false)
+
+  const handleIntersection = useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      // Use requestAnimationFrame to avoid layout thrashing
+      requestAnimationFrame(() => {
+        try {
+          const [entry] = entries
+          if (entry.isIntersecting && !isInView) {
+            setIsInView(true)
+            // Disconnect observer immediately to prevent further callbacks
+            if (observerRef.current) {
+              observerRef.current.disconnect()
+              observerRef.current = null
+            }
+          }
+        } catch (error) {
+          console.warn("IntersectionObserver callback error:", error)
+        }
+      })
+    },
+    [isInView],
+  )
 
   useEffect(() => {
     if (!formRef.current || isInView) return
 
     try {
-      observerRef.current = new IntersectionObserver(handleIntersection, {
-        threshold: 0.1,
-        rootMargin: "100px",
-      })
+      const createObserver = () => {
+        try {
+          observerRef.current = new IntersectionObserver(handleIntersection, {
+            threshold: 0.1,
+            rootMargin: "100px",
+          })
 
-      observerRef.current.observe(formRef.current)
-    } catch (error) {
-      console.warn("IntersectionObserver error:", error)
-      setIsInView(true)
-    }
-
-    return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect()
-        observerRef.current = null
+          if (formRef.current) {
+            observerRef.current.observe(formRef.current)
+          }
+        } catch (error) {
+          console.warn("IntersectionObserver creation error:", error)
+          // Fallback: set in view immediately
+          setIsInView(true)
+        }
       }
+
+      const timeoutId = setTimeout(createObserver, 100)
+
+      return () => {
+        clearTimeout(timeoutId)
+        if (observerRef.current) {
+          try {
+            observerRef.current.disconnect()
+          } catch (error) {
+            console.warn("Observer disconnect error:", error)
+          }
+          observerRef.current = null
+        }
+      }
+    } catch (error) {
+      console.warn("IntersectionObserver setup error:", error)
+      setIsInView(true)
     }
   }, [handleIntersection, isInView])
 
-  useEffect(() => {
-    if (isInView && scriptLoaded && !isLoaded && window.hbspt) {
+  const createForm = useCallback(() => {
+    if (window.hbspt && window.hbspt.forms && !formCreatedRef.current && formContainerRef.current) {
       try {
+        if (formContainerRef.current) {
+          formContainerRef.current.innerHTML = ""
+        }
+
         window.hbspt.forms.create({
-          portalId: "22460986",
-          formId: "e868b09c-6f97-48da-bf52-afbc82a1f232",
-          region: "na1",
-          target: "#hubspot-form-container",
+          portalId,
+          formId,
+          region,
+          target: `#${targetId}`,
           css: `
             .hs-form-field label {
               color: #1f2937;
@@ -141,40 +248,63 @@ export default function HubspotForm() {
             }
           `,
         })
-        setIsLoaded(true)
+        formCreatedRef.current = true
       } catch (error) {
         console.error("HubSpot form creation error:", error)
       }
     }
-  }, [isInView, scriptLoaded, isLoaded])
+  }, [portalId, formId, region, targetId])
+
+  useEffect(() => {
+    if (isInView && !formCreatedRef.current) {
+      loadHubSpotScript()
+        .then(() => {
+          setTimeout(() => {
+            createForm()
+          }, 50)
+        })
+        .catch((error) => {
+          console.error("Failed to load HubSpot script:", error)
+        })
+    }
+  }, [isInView, createForm])
+
+  useEffect(() => {
+    return () => {
+      if (formContainerRef.current) {
+        try {
+          formContainerRef.current.innerHTML = ""
+        } catch (error) {
+          console.warn("Cleanup error:", error)
+        }
+      }
+      formCreatedRef.current = false
+    }
+  }, [])
+
+  const isHeroVariant = variant === "hero"
+  const decorativeColor = isHeroVariant ? "amber" : "blue"
 
   return (
     <div className="relative mt-8 md:mt-0" ref={formRef}>
-      {isInView && (
-        <Script
-          src="https://js.hsforms.net/forms/embed/v2.js"
-          strategy="lazyOnload"
-          onLoad={() => {
-            console.log("[v0] HubSpot script loaded successfully")
-            setScriptLoaded(true)
-          }}
-          onError={(e) => {
-            console.error("[v0] Failed to load HubSpot script:", e)
-          }}
-        />
-      )}
-
       {/* Background decorative elements */}
-      <div className="absolute -top-5 -right-5 w-32 h-32 bg-amber-100 rounded-full blur-2xl opacity-50"></div>
-      <div className="absolute -bottom-5 -left-5 w-32 h-32 bg-blue-50 rounded-full blur-2xl opacity-50"></div>
+      <div
+        className={`absolute -top-5 -right-5 w-32 h-32 bg-${decorativeColor}-100 rounded-full blur-2xl opacity-50`}
+      ></div>
+      <div
+        className={`absolute -bottom-5 -left-5 w-32 h-32 bg-${decorativeColor}-50 rounded-full blur-2xl opacity-50`}
+      ></div>
 
       <div
-        id="hubspot-form-container"
+        id={targetId}
+        ref={formContainerRef}
         className="relative bg-white rounded-xl shadow-xl p-5 md:p-8 border border-gray-100 min-h-[400px] z-10"
       >
         <div className="mb-4 md:mb-6 text-center">
-          <div className="inline-block mb-2 bg-amber-50 px-3 py-1 rounded-full border border-amber-100">
-            <span className="text-xs md:text-sm font-medium text-amber-800">Franquicia Premium</span>
+          <div
+            className={`inline-block mb-2 bg-${decorativeColor}-50 px-3 py-1 rounded-full border border-${decorativeColor}-100`}
+          >
+            <span className={`text-xs md:text-sm font-medium text-${decorativeColor}-800`}>Franquicia Premium</span>
           </div>
           <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">Abrí tu propia Franquicia Chiazza</h3>
           <p className="text-sm md:text-base text-gray-600">
@@ -182,7 +312,7 @@ export default function HubspotForm() {
           </p>
         </div>
 
-        {isInView && (!scriptLoaded || !isLoaded) && (
+        {isInView && !formCreatedRef.current && (
           <div className="flex items-center justify-center h-64">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-800"></div>
             <span className="ml-3 text-gray-600">Cargando formulario...</span>

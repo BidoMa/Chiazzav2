@@ -8,7 +8,6 @@ import TestimonialCard from "@/components/testimonial-card"
 import ProductShowcase from "@/components/product-showcase"
 import { Separator } from "@/components/ui/separator"
 import HubspotForm from "@/components/hubspot-form"
-import HubspotFormContact from "@/components/hubspot-form-contact"
 import AnimatedCTA from "@/components/animated-cta"
 import BenefitsSection from "@/components/benefits-section"
 import ScrollIndicator from "@/components/scroll-indicator"
@@ -194,7 +193,7 @@ export default function Home() {
             </div>
             <div className="block">
               <Suspense fallback={<div className="min-h-[400px] bg-white/10 rounded-xl animate-pulse"></div>}>
-                <HubspotForm />
+                <HubspotForm targetId="hero-hubspot-form" variant="hero" />
               </Suspense>
             </div>
           </div>
@@ -371,7 +370,7 @@ export default function Home() {
             </div>
 
             <Suspense fallback={<div className="min-h-[400px] bg-white rounded-xl shadow-lg animate-pulse"></div>}>
-              <HubspotFormContact />
+              <HubspotForm targetId="contact-section-hubspot-form" variant="contact" />
             </Suspense>
           </div>
         </div>
