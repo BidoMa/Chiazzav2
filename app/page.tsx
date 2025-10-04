@@ -13,7 +13,7 @@ import ScrollIndicator from "@/components/scroll-indicator"
 import ProductionCenter from "@/components/production-center"
 import HeroBackground from "@/components/hero-background"
 import YouTubeEmbed from "@/components/youtube-embed"
-import ChiazzaHubSpotForm from "@/components/chiazza-hubspot-form"
+import SimpleHubSpotForm from "@/components/simple-hubspot-form"
 
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -193,7 +193,7 @@ export default function Home() {
             </div>
             <div className="block">
               <Suspense fallback={<div className="min-h-[400px] bg-white/10 rounded-xl animate-pulse"></div>}>
-                <ChiazzaHubSpotForm targetId="hubspot-form-hero" variant="hero" />
+                <SimpleHubSpotForm formId="chiazza-form-hero" />
               </Suspense>
             </div>
           </div>
@@ -370,7 +370,7 @@ export default function Home() {
             </div>
             <div className="block">
               <Suspense fallback={<div className="min-h-[400px] bg-white rounded-xl shadow-lg animate-pulse"></div>}>
-                <ChiazzaHubSpotForm targetId="hubspot-form-contact" variant="contact" />
+                <SimpleHubSpotForm formId="chiazza-form-contact" />
               </Suspense>
             </div>
           </div>
