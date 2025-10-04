@@ -7,13 +7,13 @@ import { Coffee, Star, Award, Users, X } from "lucide-react"
 import TestimonialCard from "@/components/testimonial-card"
 import ProductShowcase from "@/components/product-showcase"
 import { Separator } from "@/components/ui/separator"
-import ChiazzaContactForm from "@/components/chiazza-contact-form"
 import AnimatedCTA from "@/components/animated-cta"
 import BenefitsSection from "@/components/benefits-section"
 import ScrollIndicator from "@/components/scroll-indicator"
 import ProductionCenter from "@/components/production-center"
 import HeroBackground from "@/components/hero-background"
 import YouTubeEmbed from "@/components/youtube-embed"
+import ChiazzaHubSpotForm from "@/components/chiazza-hubspot-form"
 
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -193,7 +193,7 @@ export default function Home() {
             </div>
             <div className="block">
               <Suspense fallback={<div className="min-h-[400px] bg-white/10 rounded-xl animate-pulse"></div>}>
-                <ChiazzaContactForm formIdentifier="chiazza-hero-form" displayVariant="primary" />
+                <ChiazzaHubSpotForm targetId="hubspot-form-hero" variant="hero" />
               </Suspense>
             </div>
           </div>
@@ -368,10 +368,11 @@ export default function Home() {
                 />
               </div>
             </div>
-
-            <Suspense fallback={<div className="min-h-[400px] bg-white rounded-xl shadow-lg animate-pulse"></div>}>
-              <ChiazzaContactForm formIdentifier="chiazza-contact-form" displayVariant="secondary" />
-            </Suspense>
+            <div className="block">
+              <Suspense fallback={<div className="min-h-[400px] bg-white rounded-xl shadow-lg animate-pulse"></div>}>
+                <ChiazzaHubSpotForm targetId="hubspot-form-contact" variant="contact" />
+              </Suspense>
+            </div>
           </div>
         </div>
       </section>
