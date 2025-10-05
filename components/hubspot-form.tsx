@@ -2,8 +2,10 @@
 
 import { useEffect, useRef, useId } from "react"
 
-let hubspotScriptLoaded = false
-let hubspotScriptLoading = false
+// Variables globales para controlar la carga del script
+let scriptLoaded = false
+let scriptLoading = false
+const scriptLoadCallbacks: Array<() => void> = []
 
 interface HubspotFormProps {
   portalId: string
@@ -14,53 +16,80 @@ interface HubspotFormProps {
 
 export default function HubspotForm({ portalId, formId, region, targetId }: HubspotFormProps) {
   const generatedId = useId()
-  const uniqueId = targetId || `hubspot-form-${generatedId}`
-  const formContainerRef = useRef<HTMLDivElement>(null)
-  const formCreatedRef = useRef(false)
+  const formId_unique = targetId || `hubspot-form-${generatedId.replace(/:/g, "-")}`
+  const containerRef = useRef<HTMLDivElement>(null)
+  const formCreated = useRef(false)
+  const mounted = useRef(true)
 
   useEffect(() => {
-    const loadHubSpotScript = (): Promise<void> => {
-      return new Promise((resolve, reject) => {
-        // Si ya está cargado, resolver inmediatamente
-        if (hubspotScriptLoaded) {
+    mounted.current = true
+
+    const loadScript = () => {
+      return new Promise<void>((resolve, reject) => {
+        if (scriptLoaded && window.hbspt?.forms) {
           resolve()
           return
         }
 
-        // Si está cargando, esperar con polling
-        if (hubspotScriptLoading) {
-          const checkInterval = setInterval(() => {
-            if (hubspotScriptLoaded) {
-              clearInterval(checkInterval)
+        if (scriptLoading) {
+          scriptLoadCallbacks.push(resolve)
+          return
+        }
+
+        const existing = document.querySelector('script[src*="js.hsforms.net"]')
+        if (existing) {
+          scriptLoaded = true
+          if (window.hbspt?.forms) {
+            resolve()
+            return
+          }
+          // Esperar a que esté disponible
+          const checkReady = setInterval(() => {
+            if (window.hbspt?.forms) {
+              clearInterval(checkReady)
               resolve()
             }
-          }, 100)
+          }, 50)
+          setTimeout(() => {
+            clearInterval(checkReady)
+            reject(new Error("HubSpot script timeout"))
+          }, 10000)
           return
         }
 
-        // Verificar si el script ya existe en el DOM
-        const existingScript = document.querySelector('script[src*="js.hsforms.net"]')
-        if (existingScript) {
-          hubspotScriptLoaded = true
-          resolve()
-          return
-        }
-
-        // Cargar el script
-        hubspotScriptLoading = true
+        scriptLoading = true
         const script = document.createElement("script")
         script.src = "https://js.hsforms.net/forms/embed/v2.js"
         script.async = true
+        script.defer = true
         script.charset = "utf-8"
 
         script.onload = () => {
-          hubspotScriptLoaded = true
-          hubspotScriptLoading = false
-          resolve()
+          // Esperar a que hbspt esté disponible
+          const checkReady = setInterval(() => {
+            if (window.hbspt?.forms) {
+              clearInterval(checkReady)
+              scriptLoaded = true
+              scriptLoading = false
+              resolve()
+              // Ejecutar callbacks pendientes
+              scriptLoadCallbacks.forEach((cb) => cb())
+              scriptLoadCallbacks.length = 0
+            }
+          }, 50)
+
+          // Timeout de seguridad
+          setTimeout(() => {
+            clearInterval(checkReady)
+            if (!scriptLoaded) {
+              scriptLoading = false
+              reject(new Error("HubSpot API not available"))
+            }
+          }, 10000)
         }
 
         script.onerror = () => {
-          hubspotScriptLoading = false
+          scriptLoading = false
           reject(new Error("Failed to load HubSpot script"))
         }
 
@@ -68,13 +97,13 @@ export default function HubspotForm({ portalId, formId, region, targetId }: Hubs
       })
     }
 
-    const createForm = () => {
-      if (!window.hbspt?.forms) {
-        console.error("HubSpot forms API not available")
+    const initForm = () => {
+      if (!mounted.current || formCreated.current || !containerRef.current) {
         return
       }
 
-      if (formCreatedRef.current) {
+      if (!window.hbspt?.forms) {
+        console.error("[Chiazza] HubSpot forms API not available")
         return
       }
 
@@ -83,35 +112,37 @@ export default function HubspotForm({ portalId, formId, region, targetId }: Hubs
           portalId,
           formId,
           region,
-          target: `#${uniqueId}`,
+          target: `#${formId_unique}`,
         })
-        formCreatedRef.current = true
+        formCreated.current = true
       } catch (error) {
-        console.error("Error creating HubSpot form:", error)
+        console.error("[Chiazza] Error creating form:", error)
       }
     }
 
-    loadHubSpotScript()
+    loadScript()
       .then(() => {
-        // Delay de 100ms para asegurar que el API esté disponible
-        setTimeout(createForm, 100)
+        if (mounted.current) {
+          // Delay para asegurar que el DOM esté listo
+          setTimeout(initForm, 150)
+        }
       })
       .catch((error) => {
-        console.error("Error loading HubSpot script:", error)
+        console.error("[Chiazza] Script load error:", error)
       })
 
-    // Cleanup
     return () => {
-      if (formContainerRef.current) {
-        formContainerRef.current.innerHTML = ""
+      mounted.current = false
+      if (containerRef.current) {
+        containerRef.current.innerHTML = ""
       }
-      formCreatedRef.current = false
+      formCreated.current = false
     }
-  }, [portalId, formId, region, uniqueId])
+  }, [portalId, formId, region, formId_unique])
 
   return (
     <div className="bg-amber-50 rounded-2xl shadow-xl p-6 md:p-8 border-2 border-amber-200">
-      <div id={uniqueId} ref={formContainerRef} className="min-h-[400px]" />
+      <div id={formId_unique} ref={containerRef} className="min-h-[400px]" />
     </div>
   )
 }
@@ -120,12 +151,7 @@ declare global {
   interface Window {
     hbspt?: {
       forms: {
-        create: (options: {
-          portalId: string
-          formId: string
-          region: string
-          target: string
-        }) => void
+        create: (options: { portalId: string; formId: string; region: string; target: string }) => void
       }
     }
   }
